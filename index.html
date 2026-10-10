@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nguyễn Bá Tiệp — Lux Support Portfolio | League of Legends CV</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Assets Data (Base64 bundle for offline / local guarantee) -->
+  <script src="assets/assets-data.js"></script>
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="hextech-bg">
+  <!-- Audio Context Master Warning / Overlay for User Interaction -->
+  <div id="laserCanvasContainer">
+    <canvas id="vfxCanvas"></canvas>
+  </div>
+
+  <!-- Screen Shake Wrapper -->
+  <div id="appRoot" class="app-root">
+    
+    <!-- TOP HEADER / IN-GAME MATCH HUD -->
+    <header class="game-header">
+      <div class="header-left">
+        <div class="summoner-portrait-frame">
+          <img id="luxHeaderAvatar" src="assets/lux-avatar.png" alt="Lux Support" class="champion-thumb">
+          <div class="champion-level">18</div>
+        </div>
+        <div class="summoner-meta">
+          <div class="summoner-name">
+            <span class="team-tag">[FTU]</span> NGUYỄN BÁ TIỆP
+            <span class="badge-challenger">THÁCH ĐẤU 1200 LP</span>
+          </div>
+          <div class="summoner-sub">
+            <span class="role-pill">HỖ TRỢ GÁNH ĐỘI (CARRY SP)</span>
+            <span class="kda-display"><span class="kda-val">15</span> / <span class="kda-val">0</span> / <span class="kda-val">28</span> (KDA HOÀN HẢO)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Match status bar -->
+      <div class="header-center">
+        <div class="hextech-score-board">
+          <div class="score-team blue-team">
+            <span class="team-name">ĐỘI XANH</span>
+            <span class="team-score">43</span>
+          </div>
+          <div class="game-timer">
+            <span id="matchClock">25:10</span>
+            <span class="match-phase">LINH HỒN RỒNG NƯỚC</span>
+          </div>
+          <div class="score-team red-team">
+            <span class="team-score">12</span>
+            <span class="team-name">ĐỘI ĐỎ</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick actions / Audio toggle / Contact -->
+      <div class="header-right">
+        <button id="soundToggleBtn" class="hextech-btn-sm" title="Bật/Tắt Âm Thanh LMHT">
+          <span class="icon-speaker">🔊</span> <span id="soundLabel">ÂM THANH: BẬT</span>
+        </button>
+        <button id="downloadPdfBtn" class="hextech-btn-sm primary-gold" title="Tải CV Bản Gốc">
+          <span>📜 TẢI CV GỐC</span>
+        </button>
+        <button id="guideBtn" class="hextech-btn-sm" title="Hướng dẫn tương tác">
+          <span>❓ HƯỚNG DẪN</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN BATTLEFIELD & CV INTERACTION CONTAINER -->
+    <main class="main-stage">
+      
+      <!-- LEFT: SUMMONER'S RIFT INTERACTIVE TACTICAL MAP -->
+      <section class="map-viewport-section">
+        <div class="hextech-panel-title">
+          <div class="title-decor"></div>
+          <h2>BẢN ĐỒ CHIẾN THUẬT: ĐẢO ĐƯỜNG CÁNH XANH</h2>
+          <div class="lane-status-badge" id="currentLaneBadge">BỆ ĐÁ CỔ (XUẤT PHÁT)</div>
+        </div>
+
+        <div class="map-container" id="mapContainer">
+          <!-- The Summoner's Rift Map Background -->
+          <img id="mapImage" src="assets/summoners-rift.jpg" alt="Bản đồ Summoner Rift" class="map-bg">
+          
+          <!-- Path Canvas for Waypoints & Glowing Roaming Route -->
+          <canvas id="mapPathCanvas" class="map-path-canvas"></canvas>
+
+          <!-- LANE MARKERS ON SUMMONER'S RIFT -->
+          <!-- 1. Fountain / Blue Base (Overview) -->
+          <div class="map-marker" id="marker-fountain" data-lane="fountain" style="left: 14%; top: 83%;" title="Bệ Đá Cổ - Giới thiệu & Triệu Hồi Sư">
+            <div class="marker-pulse"></div>
+            <div class="marker-icon-wrapper base-marker">
+              <img src="assets/icon-support.png" alt="Bệ Đá Cổ" class="lane-icon-img">
+            </div>
+            <div class="marker-label">BỆ ĐÁ CỔ</div>
+          </div>
+
+          <!-- 2. Bot Lane (Học Vấn FTU - LSCM) -->
+          <div class="map-marker" id="marker-bot" data-lane="bot" style="left: 77%; top: 86%;" title="Đường Dưới - Học Vấn & Nền Tảng">
+            <div class="marker-pulse"></div>
+            <div class="marker-icon-wrapper">
+              <img src="assets/icon-bot.png" alt="Bot Lane" class="lane-icon-img">
+            </div>
+            <div class="marker-label">BOT (HỌC VẤN)</div>
+          </div>
+
+          <!-- 3. Jungle (Kỹ Năng & Tầm Nhìn) -->
+          <div class="map-marker" id="marker-jungle" data-lane="jungle" style="left: 36%; top: 63%;" title="Khu Vực Rừng - Kỹ Năng & Tầm Nhìn">
+            <div class="marker-pulse"></div>
+            <div class="marker-icon-wrapper">
+              <img src="assets/icon-jungle.png" alt="Jungle" class="lane-icon-img">
+            </div>
+            <div class="marker-label">RỪNG (KỸ NĂNG)</div>
+          </div>
+
+          <!-- 4. Mid Lane (Kinh Nghiệm Leader & Sales) -->
+          <div class="map-marker" id="marker-mid" data-lane="mid" style="left: 50%; top: 50%;" title="Đường Giữa - Kinh Nghiệm Thực Chiến">
+            <div class="marker-pulse"></div>
+            <div class="marker-icon-wrapper">
+              <img src="assets/icon-mid.png" alt="Mid Lane" class="lane-icon-img">
+            </div>
+            <div class="marker-label">MID (KINH NGHIỆM)</div>
+          </div>
+
+          <!-- 5. Top Lane (Giải 3 Cuộc thi I-Buddy IBCONNECT) -->
+          <div class="map-marker" id="marker-top" data-lane="top" style="left: 17%; top: 23%;" title="Đường Trên - Thành Tựu Đột Phá">
+            <div class="marker-pulse"></div>
+            <div class="marker-icon-wrapper">
+              <img src="assets/icon-top.png" alt="Top Lane" class="lane-icon-img">
+            </div>
+            <div class="marker-label">TOP (GIẢI THƯỞNG)</div>
+          </div>
+
+          <!-- LUX SPRITE / TOKEN DI CHUYỂN TRÊN BẢN ĐỒ -->
+          <div id="luxSprite" class="lux-sprite">
+            <!-- Ping indicator when moving -->
+            <div id="luxPing" class="on-my-way-ping">
+              <div class="ping-arrow"></div>
+              <div class="ping-ring"></div>
+            </div>
+            <!-- Overhead champion tag -->
+            <div class="lux-overhead">
+              <div class="overhead-name">Tiệp (Lux)</div>
+              <div class="overhead-bars">
+                <div class="overhead-hp"></div>
+                <div class="overhead-mana"></div>
+              </div>
+            </div>
+            <!-- Champion Avatar Circle -->
+            <div class="lux-avatar-circle">
+              <img id="luxSpriteImg" src="assets/lux-avatar.png" alt="Lux">
+              <div class="lux-glow-aura"></div>
+            </div>
+          </div>
+
+          <!-- Laser Targeting Reticle Overlay on Map -->
+          <div id="aimCrosshair" class="aim-crosshair hidden">
+            <div class="aim-line"></div>
+            <div class="aim-reticle"></div>
+            <div class="aim-hint">CLICK CHUỘT TRÊN BẢN ĐỒ ĐỂ XẢ CẦU VỒNG TỐI THƯỢNG (R)</div>
+          </div>
+        </div>
+
+        <!-- ROAMING CONTROLLER / TỰ ĐỘNG ĐẢO ĐƯỜNG & SPEED -->
+        <div class="roam-controller-bar">
+          <div class="controller-buttons">
+            <button id="autoRoamBtn" class="hextech-btn-gold">
+              <span class="btn-icon">⚡</span> <span id="autoRoamText">TỰ ĐỘNG ĐẢO ĐƯỜNG</span>
+            </button>
+            <button id="prevLaneBtn" class="hextech-btn-nav" title="Lane Trước">◀</button>
+            <button id="nextLaneBtn" class="hextech-btn-nav" title="Lane Tiếp">▶</button>
+            <div class="speed-toggle">
+              <button class="speed-btn active" data-speed="1">1x</button>
+              <button class="speed-btn" data-speed="2">2x</button>
+            </div>
+          </div>
+          <div class="roam-progress-container">
+            <div class="progress-info">
+              <span>LỘ TRÌNH TUẦN TRA GANK:</span>
+              <span id="routeStepText" class="highlight-gold">Bệ Đá Cổ ➔ Bot ➔ Rừng ➔ Mid ➔ Top ➔ Bệ Đá Cổ</span>
+            </div>
+            <div class="hextech-progress-track">
+              <div id="roamProgressBar" class="progress-bar-fill"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RIGHT: HEXTECH CV CODEX & MISSION DETAILS -->
+      <section class="cv-codex-section">
+        <div class="codex-container">
+          
+          <!-- Lane Switch Tabs -->
+          <nav class="codex-tabs">
+            <button class="tab-btn active" data-lane="fountain">
+              <img src="assets/icon-support.png" class="tab-icon">
+              <span>TỔNG QUAN</span>
+            </button>
+            <button class="tab-btn" data-lane="bot">
+              <img src="assets/icon-bot.png" class="tab-icon">
+              <span>HỌC VẤN (BOT)</span>
+            </button>
+            <button class="tab-btn" data-lane="jungle">
+              <img src="assets/icon-jungle.png" class="tab-icon">
+              <span>KỸ NĂNG (RỪNG)</span>
+            </button>
+            <button class="tab-btn" data-lane="mid">
+              <img src="assets/icon-mid.png" class="tab-icon">
+              <span>KINH NGHIỆM (MID)</span>
+            </button>
+            <button class="tab-btn" data-lane="top">
+              <img src="assets/icon-top.png" class="tab-icon">
+              <span>GIẢI THƯỞNG (TOP)</span>
+            </button>
+          </nav>
+
+          <!-- CV Content Panel with Hextech Ornate Border -->
+          <div class="hextech-card-wrapper">
+            <div class="hextech-card-inner">
+              
+              <!-- SECTION 1: FOUNTAIN / SUMMONER OVERVIEW -->
+              <div class="cv-lane-content active" id="content-fountain">
+                <div class="lane-header">
+                  <div class="lane-tag-row">
+                    <span class="lane-pill base-pill">BỆ ĐÁ CỔ — BLUE TEAM FOUNTAIN</span>
+                    <span class="role-desc">ĐIỂM XUẤT PHÁT CHIẾN THUẬT</span>
+                  </div>
+                  <h1 class="candidate-name">NGUYỄN BÁ TIỆP</h1>
+                  <p class="candidate-headline">Sinh viên Kinh Doanh Quốc Tế & Logistics | Đại Học Ngoại Thương (FTU)</p>
+                </div>
+
+                <div class="summoner-profile-card">
+                  <div class="user-avatar-box">
+                    <img id="userRealAvatar" src="assets/user-avatar.png" alt="Nguyễn Bá Tiệp" class="user-real-photo">
+                    <div class="lux-cosmic-inset">
+                      <img src="assets/lux-avatar.png" alt="Cosmic Lux">
+                    </div>
+                  </div>
+                  <div class="user-stats-list">
+                    <div class="stat-row">
+                      <span class="stat-label">MÃ SINH VIÊN (MSSV):</span>
+                      <span class="stat-value highlight-gold">2515510139</span>
+                    </div>
+                    <div class="stat-row">
+                      <span class="stat-label">LỚP CHUYÊN NGÀNH:</span>
+                      <span class="stat-value">K64 - IBZ.S - ANH 02</span>
+                    </div>
+                    <div class="stat-row">
+                      <span class="stat-label">NGÀY SINH:</span>
+                      <span class="stat-value">21 / 03 / 2007</span>
+                    </div>
+                    <div class="stat-row">
+                      <span class="stat-label">QUÊ QUÁN:</span>
+                      <span class="stat-value">Bắc Ninh</span>
+                    </div>
+                    <div class="stat-row">
+                      <span class="stat-label">ĐIỆN THOẠI:</span>
+                      <a href="tel:0971546639" class="stat-value link-gold">0971 546 639</a>
+                    </div>
+                    <div class="stat-row">
+                      <span class="stat-label">EMAIL FTU:</span>
+                      <a href="mailto:k64.2515510139@ftu.edu.vn" class="stat-value link-gold">k64.2515510139@ftu.edu.vn</a>
+                    </div>
+                    <div class="stat-row">
+                      <span class="stat-label">FACEBOOK:</span>
+                      <a href="https://www.facebook.com/nguyen.tiep.484043" target="_blank" class="stat-value link-blue">fb.com/nguyen.tiep.484043 ↗</a>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Philosophy / LoL Quote -->
+                <div class="hextech-quote-box">
+                  <div class="quote-rune">✦</div>
+                  <p class="quote-text">
+                    "Trong Liên Minh, một Lux Support gánh team không chỉ biết đứng sau bảo kê mà phải chủ động đảo đường, kiểm soát tầm nhìn và tung chiêu thức quyết định lật ngược thế cờ. Trong công việc và học tập, tôi luôn giữ tinh thần chủ động, trách nhiệm và kỷ luật tối đa!"
+                  </p>
+                </div>
+
+                <!-- Champion Radar / Power Stats -->
+                <div class="champion-attributes">
+                  <div class="attr-title">CHỈ SỐ TƯỚNG (CHARACTER STATS):</div>
+                  <div class="attr-grid">
+                    <div class="attr-bar-item">
+                      <div class="attr-head"><span>LÃNH ĐẠO & ĐIỀU PHỐI (LEADERSHIP)</span><span>95%</span></div>
+                      <div class="bar-bg"><div class="bar-fill" style="width: 95%;"></div></div>
+                    </div>
+                    <div class="attr-bar-item">
+                      <div class="attr-head"><span>TƯ DUY LOGISTICS & LSCM</span><span>90%</span></div>
+                      <div class="bar-bg"><div class="bar-fill" style="width: 90%;"></div></div>
+                    </div>
+                    <div class="attr-bar-item">
+                      <div class="attr-head"><span>SÁNG TẠO & THIẾT KẾ CANVA</span><span>92%</span></div>
+                      <div class="bar-bg"><div class="bar-fill" style="width: 92%;"></div></div>
+                    </div>
+                    <div class="attr-bar-item">
+                      <div class="attr-head"><span>GIAO TIẾP & BẢO VỆ TEAMWORK</span><span>98%</span></div>
+                      <div class="bar-bg"><div class="bar-fill" style="width: 98%;"></div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SECTION 2: BOT LANE / EDUCATION (HỌC VẤN FTU - LSCM) -->
+              <div class="cv-lane-content" id="content-bot">
+                <div class="lane-header">
+                  <div class="lane-tag-row">
+                    <span class="lane-pill bot-pill">ĐƯỜNG DƯỚI (BOT LANE) — CẶP ĐÔI TÁC CHIẾN</span>
+                    <span class="role-desc">LANING PHASE & NỀN TẢNG TRI THỨC</span>
+                  </div>
+                  <h2 class="section-title">HỌC VẤN & NỀN TẢNG HỌC THUẬT</h2>
+                </div>
+
+                <div class="experience-card glow-bot">
+                  <div class="card-top-meta">
+                    <div class="inst-logo-badge">FTU</div>
+                    <div>
+                      <h3 class="role-title">TRƯỜNG ĐẠI HỌC NGOẠI THƯƠNG (FTU)</h3>
+                      <div class="org-name">Chuyên ngành: KINH DOANH QUỐC TẾ</div>
+                    </div>
+                    <div class="time-badge">2025 – 2029</div>
+                  </div>
+                  
+                  <div class="specialization-tag">
+                    <span class="tag-icon">📦</span> ĐỊNH HƯỚNG CHUYÊN SÂU: <strong>LOGISTICS & SUPPLY CHAIN MANAGEMENT (LSCM)</strong>
+                  </div>
+
+                  <div class="cv-desc-body">
+                    <p class="highlight-text">
+                      "Giai đoạn đi đường (Laning Phase) vững chắc là điều kiện tiên quyết để nuôi dưỡng sức mạnh gánh đội về sau."
+                    </p>
+                    <ul class="cv-bullets">
+                      <li><strong>Kiến thức chuyên môn nền tảng:</strong> Tiếp thu tư duy kinh tế quốc tế, thương mại toàn cầu, vận hành chuỗi cung ứng và logistics hiện đại từ ngôi trường kinh tế hàng đầu Việt Nam.</li>
+                      <li><strong>Phân tích & Tối ưu luồng vận hành:</strong> Nghiên cứu cách tối ưu chi phí, quản lý dòng luân chuyển hàng hóa và thông tin — tương tự việc tối ưu tài nguyên và kiểm soát đợt lính trong game.</li>
+                      <li><strong>Môi trường năng động FTU:</strong> Tôi luyện khả năng thích ứng linh hoạt, làm việc nhóm cường độ cao và tinh thần cầu tiến liên tục.</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div class="hextech-lore-tip">
+                  <span class="tip-icon">💡</span>
+                  <p><strong>Góc nhìn Lux Support:</strong> Đường dưới là nơi nuôi dưỡng Xạ thủ (Dự án). Bằng nền tảng kiến thức LSCM và tư duy vững vàng, tôi luôn đảm bảo "bot lane" luôn thắng thế trước mọi áp lực!</p>
+                </div>
+              </div>
+
+              <!-- SECTION 3: JUNGLE / SKILLS & VISION CONTROL (KỸ NĂNG & SỞ THÍCH) -->
+              <div class="cv-lane-content" id="content-jungle">
+                <div class="lane-header">
+                  <div class="lane-tag-row">
+                    <span class="lane-pill jg-pill">KHU VỰC RỪNG & SÔNG (JUNGLE)</span>
+                    <span class="role-desc">TẦM NHÌN, LINH HOẠT & CƠ ĐỘNG</span>
+                  </div>
+                  <h2 class="section-title">KỸ NĂNG CHUYÊN MÔN & TẦM NHÌN BAO QUÁT</h2>
+                </div>
+
+                <div class="skills-grid">
+                  <!-- Skill 1 -->
+                  <div class="skill-hex-card">
+                    <div class="skill-icon-header">
+                      <span class="hex-icon">🔍</span>
+                      <h4>TÌM KIẾM & CHỌN LỌC THÔNG TIN</h4>
+                    </div>
+                    <p class="skill-desc">Tổng hợp và kiểm tra thông tin chuẩn xác từ nhiều nguồn, phân tích dữ liệu đa chiều, lọc bỏ nhiễu để đưa ra quyết định chuẩn xác nhất.</p>
+                    <div class="skill-tag">Như cắm mắt kiểm soát soi sáng Fog of War</div>
+                  </div>
+
+                  <!-- Skill 2 -->
+                  <div class="skill-hex-card">
+                    <div class="skill-icon-header">
+                      <span class="hex-icon">🗣️</span>
+                      <h4>GIAO TIẾP & KẾT NỐI</h4>
+                    </div>
+                    <p class="skill-desc">Dễ dàng hòa nhập với môi trường làm việc mới, cởi mở, lắng nghe tích cực và truyền đạt thông điệp rõ ràng tới đồng đội và khách hàng.</p>
+                    <div class="skill-tag">Ping chuẩn xác & gắn kết toàn đội</div>
+                  </div>
+
+                  <!-- Skill 3 -->
+                  <div class="skill-hex-card">
+                    <div class="skill-icon-header">
+                      <span class="hex-icon">✍️</span>
+                      <h4>VIẾT THEO CHỦ ĐỀ CHUYÊN BIỆT</h4>
+                    </div>
+                    <p class="skill-desc">Có kiến thức nhất định và tư duy viết mạch lạc trong mảng Logistics & Supply Chain Management (LSCM), tạo nội dung học thuật và truyền thông thu hút.</p>
+                    <div class="skill-tag">Kiến thức ngành bài bản & sâu sắc</div>
+                  </div>
+
+                  <!-- Skill 4 -->
+                  <div class="skill-hex-card">
+                    <div class="skill-icon-header">
+                      <span class="hex-icon">💻</span>
+                      <h4>TIN HỌC VĂN PHÒNG & THIẾT KẾ</h4>
+                    </div>
+                    <p class="skill-desc">Microsoft Office cơ bản (Word, Excel, PowerPoint) phục vụ soạn thảo và xử lý dữ liệu. Thành thạo <strong>Design Canva</strong> thiết kế slide thuyết trình, poster chuyên nghiệp.</p>
+                    <div class="skill-tag">Trực quan hóa ý tưởng & dữ liệu</div>
+                  </div>
+                </div>
+
+                <!-- Interests Section -->
+                <div class="interests-banner">
+                  <div class="banner-title">SỞ THÍCH BỔ TRỢ TƯ DUY (PASSIVES):</div>
+                  <div class="interests-chips">
+                    <span class="chip">🌐 <strong>Tìm hiểu công nghệ thế giới:</strong> Cập nhật liên tục tiến bộ công nghệ toàn cầu, AI và số hóa chuỗi cung ứng.</span>
+                    <span class="chip">🐾 <strong>Yêu động vật:</strong> Bồi dưỡng sự kiên nhẫn, thấu cảm và tinh thần quan tâm, chăm sóc tập thể.</span>
+                    <span class="chip">🎧 <strong>Nghe nhạc:</strong> Tăng cường khả năng tập trung sâu và giữ bình tĩnh khi xử lý các tình huống áp lực cao.</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SECTION 4: MID LANE / LEADERSHIP & SALES EXPERIENCE (KINH NGHIỆM) -->
+              <div class="cv-lane-content" id="content-mid">
+                <div class="lane-header">
+                  <div class="lane-tag-row">
+                    <span class="lane-pill mid-pill">ĐƯỜNG GIỮA (MID LANE) — ĐẢO ĐƯỜNG GANK & GÁNH ĐỘI</span>
+                    <span class="role-desc">ĐIỀU PHỐI GIAO TRANH & TẠO ĐỘT BIẾN</span>
+                  </div>
+                  <h2 class="section-title">KINH NGHIỆM THỰC CHIẾN & LÃNH ĐẠO</h2>
+                </div>
+
+                <!-- Experience 1: Class President & Leader -->
+                <div class="experience-card glow-mid">
+                  <div class="card-top-meta">
+                    <div class="inst-logo-badge gold-bg">👑</div>
+                    <div>
+                      <h3 class="role-title">LỚP TRƯỞNG & LEADER</h3>
+                      <div class="org-name">Lớp Hành Chính & Lớp Tín Chỉ | Trường Đại Học Ngoại Thương</div>
+                    </div>
+                    <div class="time-badge">2025 – 2026</div>
+                  </div>
+                  <div class="cv-desc-body">
+                    <div class="exp-subhead">Trách nhiệm & Hành động:</div>
+                    <ul class="cv-bullets">
+                      <li>Đảm nhận trách nhiệm kết nối trực tiếp đối với nhà trường và toàn thể sinh viên trong lớp, truyền đạt thông tin nhanh chóng, chính xác.</li>
+                      <li>Thúc đẩy động lực của các thành viên trong nhóm, phân chia và sắp xếp khối lượng công việc phù hợp với thế mạnh từng người.</li>
+                    </ul>
+                    <div class="exp-subhead achiev-subhead">🏆 Những điều đã đạt được:</div>
+                    <ul class="cv-bullets achiev-list">
+                      <li><strong>Sự thấu hiểu đối với các thành viên đặc biệt là Leader:</strong> Luôn chủ động hỗ trợ leader của các nhóm cũng như các thành viên khác để vượt qua nút thắt trong công việc.</li>
+                      <li><strong>ĐIỂM A TUYỆT ĐỐI</strong> cho các đồ án và bài tập nhóm lớn.</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <!-- Experience 2: Smile Media Sales -->
+                <div class="experience-card glow-mid" style="margin-top: 16px;">
+                  <div class="card-top-meta">
+                    <div class="inst-logo-badge">💼</div>
+                    <div>
+                      <h3 class="role-title">CHUYÊN VIÊN SALES (KINH DOANH)</h3>
+                      <div class="org-name">SMILE MEDIA</div>
+                    </div>
+                    <div class="time-badge">10/2025 – 12/2025</div>
+                  </div>
+                  <div class="cv-desc-body">
+                    <ul class="cv-bullets">
+                      <li>Tích lũy kinh nghiệm thực tế trong việc tìm kiếm, phân loại và tiếp cận thông tin khách hàng tiềm năng.</li>
+                      <li>Trực tiếp tư vấn giải pháp, lắng nghe nhu cầu và trao đổi trực tiếp với khách hàng nhằm chốt giao dịch.</li>
+                      <li><strong>Tinh thần trách nhiệm công việc cao độ, sẵn sàng OT (Overtime)</strong> đảm bảo hoàn thành tiến độ và mục tiêu doanh số đề ra.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <!-- SECTION 5: TOP LANE / BREAKTHROUGH & AWARDS (GIẢI THƯỞNG I-BUDDY) -->
+              <div class="cv-lane-content" id="content-top">
+                <div class="lane-header">
+                  <div class="lane-tag-row">
+                    <span class="lane-pill top-pill">ĐƯỜNG TRÊN (TOP LANE) — ĐỘT PHÁ SOLO & GANK QUYẾT ĐỊNH</span>
+                    <span class="role-desc">CHIẾN TÍCH ĐỈNH CAO TRẬN ĐẤU</span>
+                  </div>
+                  <h2 class="section-title">GIẢI THƯỞNG & DỰ ÁN KHỞI NGHIỆP</h2>
+                </div>
+
+                <div class="award-hero-card">
+                  <div class="award-ribbon">🏆 TOP 3 CHUNG CUỘC</div>
+                  <div class="award-header-content">
+                    <div class="trophy-icon">🥉</div>
+                    <div>
+                      <h3 class="award-title">GIẢI 3 CUỘC THI KHỞI NGHIỆP I-BUDDY (IBCONNECT)</h3>
+                      <div class="award-org">Vai trò: Thành viên hình thành & phát triển ý tưởng (2025 – 2026)</div>
+                    </div>
+                  </div>
+
+                  <div class="project-details-box">
+                    <div class="p-detail-item">
+                      <span class="p-label">💡 Ý TƯỞNG CUỘC THI:</span>
+                      <span class="p-value">Mô hình khởi nghiệp — <strong>Đội ngũ tổ chức workshops chuyên nghiệp</strong> (Nền tảng kết nối chuyên gia, nâng cao năng lực sinh viên).</span>
+                    </div>
+
+                    <div class="p-detail-item">
+                      <span class="p-label">🎯 VAI TRÒ CHỦ CHỐT CỦA BẢN THÂN:</span>
+                      <ul class="cv-bullets p-bullets">
+                        <li><strong>Sáng tạo ý tưởng & giải pháp:</strong> Trực tiếp đóng góp ý tưởng cốt lõi, hoàn thiện mô hình giải pháp và lộ trình phát triển dự án khả thi.</li>
+                        <li><strong>Thiết kế Slides thuyết trình chuyên nghiệp:</strong> Phụ trách toàn bộ khâu trực quan hóa, thiết kế bài thuyết trình sinh động, ấn tượng trên Canva.</li>
+                        <li><strong>Thuyết trình & Tranh biện (Debate):</strong> Đại diện đội thi trực tiếp trình bày ý tưởng và tự tin debate phản biện trước Hội đồng Ban giám khảo chuyên môn.</li>
+                      </ul>
+                    </div>
+
+                    <!-- Canva Presentation Link Button -->
+                    <div class="canva-link-action">
+                      <a href="https://www.canva.com/design/DAG6cwk_mrk/YgZ9DOxC6xvGxzsAdEIIfA/edit" target="_blank" class="canva-cta-btn">
+                        <span class="canva-sparkle">✨</span>
+                        <span>XEM SLIDE DỰ ÁN THIẾT KẾ TRÊN CANVA ↗</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="hextech-lore-tip" style="margin-top: 16px;">
+                  <span class="tip-icon">🌟</span>
+                  <p><strong>Cú lội ngược dòng:</strong> Pha "gank Top" đem về Giải Ba I-Buddy là minh chứng rõ rệt nhất cho năng lực sáng tạo, kỹ năng thiết kế Canva xuất sắc và bản lĩnh thuyết trình trước áp lực cao của Nguyễn Bá Tiệp!</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- BOTTOM ACTION HUD: LUX SKILLS & ULTIMATE TRIGGER -->
+    <footer class="game-hud-bar">
+      <div class="hud-center-skills">
+        
+        <!-- Champion Mini Status / Items -->
+        <div class="hud-items-row">
+          <div class="item-slot" title="Vọng Âm Luden (Tốc độ tiếp thu & lan tỏa)"><div class="item-gem luden"></div></div>
+          <div class="item-slot" title="Kính Nhắm Ma Pháp (Tầm nhìn LSCM)"><div class="item-gem horizon"></div></div>
+          <div class="item-slot" title="Sách Chiêu Hồn Mejai 25 Tầng (Điểm A đồ án)"><div class="item-gem mejai"></div></div>
+          <div class="item-slot" title="Mũ Phù Thủy Rabadon (Sức mạnh gánh đội)"><div class="item-gem rabadon"></div></div>
+          <div class="item-slot" title="Đồng Hồ Cát Zhonya (Bình tĩnh xử lý)"><div class="item-gem zhonya"></div></div>
+          <div class="item-slot" title="Mắt Kiểm Soát (Research thông tin)"><div class="item-gem ward"></div></div>
+        </div>
+
+        <!-- Ability Icons (Passive, Q, W, E, R, Flash, Ignite) -->
+        <div class="abilities-dock">
+          <!-- Passive -->
+          <div class="ability-slot passive" title="Nội Tại: Chớp Lửa Soi Rọi (Illumination)">
+            <div class="ability-key">P</div>
+            <div class="ability-icon passive-icon">✦</div>
+            <div class="ability-name">SOI RỌI</div>
+          </div>
+
+          <!-- Q -->
+          <div class="ability-slot regular-skill" id="skillQ" title="Q: Khóa Ánh Sáng (Light Binding) - Bấm thử Q">
+            <div class="ability-key">Q</div>
+            <div class="ability-icon q-icon">✨</div>
+            <div class="ability-name">KHÓA</div>
+          </div>
+
+          <!-- W -->
+          <div class="ability-slot regular-skill" id="skillW" title="W: Lăng Kính Phòng Hộ (Prismatic Barrier) - Bấm thử W">
+            <div class="ability-key">W</div>
+            <div class="ability-icon w-icon">🛡️</div>
+            <div class="ability-name">LĂNG KÍNH</div>
+          </div>
+
+          <!-- E -->
+          <div class="ability-slot regular-skill" id="skillE" title="E: Quả Cầu Ánh Sáng (Lucent Singularity) - Bấm thử E">
+            <div class="ability-key">E</div>
+            <div class="ability-icon e-icon">🔮</div>
+            <div class="ability-name">CẦU SÁNG</div>
+          </div>
+
+          <!-- ULTIMATE: R - CẦU VỒNG TỐI THƯỢNG (STAR FEATURE) -->
+          <div class="ability-slot ultimate-skill" id="skillR" title="Chiêu Cuối [R]: CẦU VỒNG TỐI THƯỢNG! (Bấm phím R hoặc click)">
+            <div class="ult-halo-ring"></div>
+            <div class="ability-key ult-key">R</div>
+            <div class="ability-icon r-icon">
+              <span class="beam-symbol">⚡</span>
+            </div>
+            <div class="ability-name ult-name">CẦU VỒNG TỐI THƯỢNG</div>
+            <div class="ult-hotkey-badge">PHÍM [R]</div>
+          </div>
+
+          <!-- Summoner Spells -->
+          <div class="spell-slot" id="spellD" title="Phép bổ trợ: Tốc Biến (Flash)">
+            <div class="spell-key">D</div>
+            <div class="spell-icon flash-icon">⚡</div>
+          </div>
+          <div class="spell-slot" id="spellF" title="Phép bổ trợ: Thiêu Đốt (Ignite)">
+            <div class="spell-key">F</div>
+            <div class="spell-icon ignite-icon">🔥</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Quick interactive trigger button on HUD right -->
+      <div class="hud-right-actions">
+        <button id="triggerUltBtn" class="ult-fire-button">
+          <span class="fire-laser-icon">💥</span>
+          <div class="btn-text-col">
+            <span class="main-txt">KÍCH HOẠT CHIÊU [R]</span>
+            <span class="sub-txt">CẦU VỒNG TỐI THƯỢNG!</span>
+          </div>
+        </button>
+      </div>
+    </footer>
+
+    <!-- ANNOUNCER BANNER OVERLAY (PENTAKILL / ACE BANNER) -->
+    <div id="pentakillBanner" class="announcer-banner hidden">
+      <div class="banner-crest">
+        <img src="assets/icon-top.png" alt="Crest">
+      </div>
+      <div class="banner-title" id="announcerTitle">PENTAKILL!</div>
+      <div class="banner-subtitle" id="announcerSubtitle">LUX TRỢ THỦ GÁNH TEAM THÀNH CÔNG!</div>
+      <div class="banner-details">Ứng viên Nguyễn Bá Tiệp đã sẵn sàng tỏa sáng rực rỡ tại doanh nghiệp!</div>
+      <button id="closeBannerBtn" class="banner-dismiss-btn">TIẾP TỤC KHÁM PHÁ</button>
+    </div>
+
+    <!-- SECRET EASTER EGG / RECRUITER MODAL -->
+    <div id="recruiterModal" class="hextech-modal-overlay hidden">
+      <div class="hextech-modal-box">
+        <div class="modal-corner top-left"></div>
+        <div class="modal-corner top-right"></div>
+        <div class="modal-corner bottom-left"></div>
+        <div class="modal-corner bottom-right"></div>
+        
+        <div class="modal-header">
+          <div class="modal-crest">✨</div>
+          <h3>HUÂN CHƯƠNG CHIẾN THẦN SUPPORT 1V9</h3>
+          <button id="closeModalBtn" class="modal-close-x">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <p class="modal-intro">
+            Bạn vừa chứng kiến pha xả chiêu <strong>Cầu Vồng Tối Thượng (R)</strong> chuẩn xác quét sạch mọi rào cản! Dưới đây là tóm tắt năng lực cốt lõi của ứng viên:
+          </p>
+          <div class="modal-feature-grid">
+            <div class="feature-item">
+              <span class="feat-icon">🎯</span>
+              <div>
+                <strong>Chủ Động & Trách Nhiệm:</strong>
+                <p>Kinh nghiệm làm Lớp trưởng, Leader nhóm và Sales Smile Media rèn giũa tinh thần kỷ luật cao, không ngại OT.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <span class="feat-icon">📊</span>
+              <div>
+                <strong>Tư Duy Chuỗi Cung Ứng LSCM:</strong>
+                <p>Nền tảng sinh viên Ngoại Thương (FTU) với tư duy logic, tối ưu hóa quy trình và xử lý thông tin nhạy bén.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <span class="feat-icon">🎨</span>
+              <div>
+                <strong>Sáng Tạo & Thuyết Trình:</strong>
+                <p>Đạt Giải 3 cuộc thi I-Buddy IBCONNECT, tự tin thiết kế slide Canva đỉnh cao và debate thuyết phục.</p>
+              </div>
+            </div>
+          </div>
+          <div class="modal-cta-row">
+            <a href="tel:0971546639" class="cta-call">📞 GỌI: 0971 546 639</a>
+            <a href="mailto:k64.2515510139@ftu.edu.vn" class="cta-mail">✉️ GỬI EMAIL</a>
+            <a href="https://www.facebook.com/nguyen.tiep.484043" target="_blank" class="cta-fb">🌐 FACEBOOK</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GUIDE MODAL -->
+    <div id="guideModal" class="hextech-modal-overlay hidden">
+      <div class="hextech-modal-box">
+        <div class="modal-header">
+          <h3>HƯỚNG DẪN TRẢI NGHIỆM PORTFOLIO</h3>
+          <button id="closeGuideModalBtn" class="modal-close-x">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="guide-step">
+            <span class="step-num">1</span>
+            <div><strong>Đảo đường (Roam):</strong> Bấm nút <em>"TỰ ĐỘNG ĐẢO ĐƯỜNG"</em> hoặc click trực tiếp vào các biểu tượng Lane (Bot, Rừng, Mid, Top, Bệ Đá Cổ) trên bản đồ Summoner's Rift.</div>
+          </div>
+          <div class="guide-step">
+            <span class="step-num">2</span>
+            <div><strong>Xem CV:</strong> Khi Lux đi đến mỗi lane, thông tin CV tương ứng sẽ hiển thị chi tiết ở khung bên phải với phong cách Hextech.</div>
+          </div>
+          <div class="guide-step">
+            <span class="step-num">3</span>
+            <div><strong>Tung Chiêu Cuối R:</strong> Bấm phím <strong>[R]</strong> trên bàn phím hoặc click nút <strong>"CẦU VỒNG TỐI THƯỢNG"</strong> để ngắm và bắn tia laser xuyên bản đồ!</div>
+          </div>
+          <div class="guide-step">
+            <span class="step-num">4</span>
+            <div><strong>Thử các kỹ năng khác:</strong> Bấm thử phím <strong>Q, W, E, D, F</strong> trên HUD để kích hoạt hiệu ứng âm thanh và phép bổ trợ.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
